@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "TickTrack",
+  "version": "1.0.0",
+  "description": "Professional countdown timer for your goals and deadlines.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["storage"]
+}
