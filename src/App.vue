@@ -38,6 +38,28 @@
             {{ errorMessage }}
           </p>
         </div>
+
+        <!-- Color Picker -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium mb-1">Pick a Color</label>
+          <div class="flex space-x-2">
+            <div
+              v-for="preset in colorPresets"
+              :key="preset.name"
+              @click="selectedColor = preset.bgClass"
+              :class="[
+                preset.bgClass,
+                'w-8 h-8 rounded-full cursor-pointer',
+                {
+                  'ring-2 ring-offset-2 ring-blue-500':
+                    selectedColor === preset.bgClass,
+                },
+              ]"
+              :title="preset.name"
+            ></div>
+          </div>
+        </div>
+
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
@@ -53,19 +75,23 @@
       >
         No timers added yet. Add one above!
       </div>
-
       <div v-else class="space-y-4">
         <div
           v-for="timer in timers"
           :key="timer.id"
-          class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-4 rounded-md shadow-sm"
+          :class="[
+            'flex items-center justify-between p-4 rounded-md shadow-sm',
+            timer.color,
+            colorPresets.find((p) => p.bgClass === timer.color)?.textClass ||
+              'text-gray-900 dark:text-gray-100',
+          ]"
         >
           <div>
             <h3 class="text-lg font-semibold">{{ timer.eventName }}</h3>
-            <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            <div class="text-sm mb-2">
               Target: {{ formatDateTime(timer.targetDateTime) }}
             </div>
-            <div class="text-xl font-mono text-blue-600 dark:text-blue-400">
+            <div class="text-xl font-mono">
               <span v-if="timer.remaining.total > 0">
                 {{ timer.remaining.days }}d {{ timer.remaining.hours }}h
                 {{ timer.remaining.minutes }}m {{ timer.remaining.seconds }}s
@@ -110,6 +136,7 @@ interface Timer {
   id: string;
   eventName: string;
   targetDateTime: string;
+  color: string; // Add color property
   remaining: {
     total: number;
     days: number;
@@ -119,11 +146,29 @@ interface Timer {
   };
 }
 
+interface ColorPreset {
+  name: string;
+  bgClass: string;
+  textClass: string;
+}
+
 const newEventName = ref("");
 const newTargetDateTime = ref("");
+const selectedColor = ref<string>("bg-blue-100"); // Default selected color
 const timers = ref<Timer[]>([]);
 const errorMessage = ref<string | null>(null);
 let timerInterval: number | undefined;
+
+const colorPresets: ColorPreset[] = [
+  { name: "Blue", bgClass: "bg-blue-100", textClass: "text-blue-900" },
+  { name: "Red", bgClass: "bg-red-100", textClass: "text-red-900" },
+  { name: "Green", bgClass: "bg-green-100", textClass: "text-green-900" },
+  { name: "Purple", bgClass: "bg-purple-100", textClass: "text-purple-900" },
+  { name: "Yellow", bgClass: "bg-yellow-100", textClass: "text-yellow-900" },
+  { name: "Pink", bgClass: "bg-pink-100", textClass: "text-pink-900" },
+  { name: "Gray", bgClass: "bg-gray-100", textClass: "text-gray-900" },
+  { name: "Indigo", bgClass: "bg-indigo-100", textClass: "text-indigo-900" },
+];
 
 const getMinDateTime = () => {
   const now = new Date();
@@ -197,6 +242,7 @@ const saveTimers = async () => {
         id: timer.id,
         eventName: timer.eventName,
         targetDateTime: timer.targetDateTime,
+        color: timer.color, // Include color in stored data
       })),
     );
     await storage.setItem(STORAGE_KEY, timersToStore);
@@ -260,6 +306,7 @@ const addTimer = async () => {
     id: Date.now().toString(),
     eventName: newEventName.value,
     targetDateTime: newTargetDateTime.value,
+    color: selectedColor.value, // Assign selected color
     remaining: calculateRemainingTime(newTargetDateTime.value),
   };
   timers.value.push(newTimer);
