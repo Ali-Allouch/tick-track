@@ -3,70 +3,100 @@
     class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 transition-colors duration-200"
   >
     <div
-      class="max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
+      class="tick-track-container max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
     >
       <h1 class="text-3xl font-bold mb-6 text-center">TickTrack</h1>
 
-      <!-- New Timer Form -->
-      <form @submit.prevent="addTimer" class="mb-8 space-y-4">
-        <div>
-          <label for="eventName" class="block text-sm font-medium mb-1"
-            >Event Name</label
-          >
-          <input
-            type="text"
-            id="eventName"
-            v-model="newEventName"
-            placeholder="e.g., Project Deadline"
-            class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label for="targetDateTime" class="block text-sm font-medium mb-1"
-            >Target Date and Time</label
-          >
-          <input
-            type="datetime-local"
-            id="targetDateTime"
-            v-model="newTargetDateTime"
-            :min="minDateTime"
-            class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-          <p v-if="errorMessage" class="text-red-500 text-sm mt-1">
-            {{ errorMessage }}
-          </p>
-        </div>
-
-        <!-- Color Picker -->
-        <div class="mt-4">
-          <label class="block text-sm font-medium mb-1">Pick a Color</label>
-          <div class="flex space-x-2">
-            <div
-              v-for="preset in colorPresets"
-              :key="preset.name"
-              @click="selectedColor = preset.bgClass"
-              :class="[
-                preset.bgClass,
-                'w-8 h-8 rounded-full cursor-pointer',
-                {
-                  'ring-2 ring-offset-2 ring-blue-500':
-                    selectedColor === preset.bgClass,
-                },
-              ]"
-              :title="preset.name"
-            ></div>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+      <!-- Add New Timer Toggle -->
+      <div
+        class="flex items-center justify-between bg-white dark:bg-gray-700 p-4 rounded-md shadow-sm mb-4 cursor-pointer"
+        @click="isFormOpen = !isFormOpen"
+      >
+        <h2 class="text-xl font-semibold">Add New Timer</h2>
+        <svg
+          :class="[
+            'w-6 h-6 transition-transform duration-300',
+            { 'rotate-45': isFormOpen },
+          ]"
+          fill="currentColor"
+          viewBox="0 0 20 20"
         >
-          Add Timer
-        </button>
-      </form>
+          <path
+            fill-rule="evenodd"
+            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+      </div>
+
+      <!-- New Timer Form (Collapsible) -->
+      <Transition name="accordion">
+        <form
+          v-if="isFormOpen"
+          @submit.prevent="addTimer"
+          class="mb-8 space-y-4 overflow-hidden"
+        >
+          <div>
+            <label for="eventName" class="block text-sm font-medium mb-1"
+              >Event Name</label
+            >
+            <input
+              type="text"
+              id="eventName"
+              v-model="newEventName"
+              placeholder="e.g., Project Deadline"
+              class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label for="targetDateTime" class="block text-sm font-medium mb-1"
+              >Target Date and Time</label
+            >
+            <input
+              type="datetime-local"
+              id="targetDateTime"
+              v-model="newTargetDateTime"
+              :min="minDateTime"
+              class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+            <p v-if="errorMessage" class="text-red-500 text-sm mt-1">
+              {{ errorMessage }}
+            </p>
+          </div>
+
+          <!-- Color Picker -->
+          <div class="mt-4">
+            <label class="block text-sm font-medium mb-1">Pick a Color</label>
+            <div
+              class="color-picker-container flex bg-white w-fit space-x-2 p-1 rounded-[32px]"
+            >
+              <div
+                v-for="preset in colorPresets"
+                :key="preset.name"
+                @click="selectedColor = preset.bgClass"
+                :class="[
+                  preset.bgClass,
+                  'w-8 h-8 rounded-full cursor-pointer',
+                  {
+                    'ring-2 ring-offset-2 ring-blue-500':
+                      selectedColor === preset.bgClass,
+                  },
+                ]"
+                :title="preset.name"
+              ></div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 cursor-pointer"
+          >
+            Add Timer
+          </button>
+        </form>
+      </Transition>
 
       <!-- Timer List -->
       <div
@@ -157,6 +187,7 @@ const newTargetDateTime = ref("");
 const selectedColor = ref<string>("bg-blue-100"); // Default selected color
 const timers = ref<Timer[]>([]);
 const errorMessage = ref<string | null>(null);
+const isFormOpen = ref(false); // State for form visibility
 let timerInterval: number | undefined;
 
 const colorPresets: ColorPreset[] = [
@@ -314,6 +345,7 @@ const addTimer = async () => {
   await saveTimers(); // Await saving to ensure persistence
   newEventName.value = "";
   newTargetDateTime.value = "";
+  isFormOpen.value = false; // Auto-collapse the form after adding a timer
 };
 
 const deleteTimer = (id: string) => {
@@ -345,5 +377,25 @@ body,
 #app {
   min-height: 100vh;
   margin: 0;
+}
+
+.tick-track-container {
+  background: #08a3b9;
+  background: linear-gradient(
+    90deg,
+    rgb(219 250 255) 0%,
+    rgb(228 255 204) 100%
+  );
+}
+
+.accordion-enter-active,
+.accordion-leave-active {
+  transition: all 0.3s ease-in-out;
+  max-height: 500px;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 </style>
