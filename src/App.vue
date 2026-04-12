@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 transition-colors duration-200"
+    class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 transition-colors duration-200 w-[400px] overflow-x-hidden"
   >
     <div
       class="tick-track-container max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
@@ -70,7 +70,7 @@
           <div class="mt-4">
             <label class="block text-sm font-medium mb-1">Pick a Color</label>
             <div
-              class="color-picker-container flex bg-white w-fit space-x-2 p-1 rounded-[32px]"
+              class="color-picker-container flex bg-white justify-between space-x-2 p-1 rounded-[32px]"
             >
               <div
                 v-for="preset in colorPresets"
@@ -377,6 +377,8 @@ body,
 #app {
   min-height: 100vh;
   margin: 0;
+  min-width: 400px;
+  overflow-x: hidden;
 }
 
 .tick-track-container {
