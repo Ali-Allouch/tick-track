@@ -37,8 +37,8 @@ To set up and run TickTrack locally, follow these steps:
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/Ali-Allouch/ticktrack.git
-    cd ticktrack
+    git clone https://github.com/Ali-Allouch/tick-track.git
+    cd tick-track
     ```
 
 2.  **Install dependencies and build the project**:
